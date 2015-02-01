@@ -118,6 +118,16 @@ module BacklogsPlugin
 
           if issue.is_story?
             snippet += '<p>'
+            snippet += context[:form].select(:acceptance_rate, [
+             ['Ужасно', -2],
+             ['Плохо', -1],
+             ['Нормально', 0],
+             ['Хорошо', 1],
+             ['Отлично', 2]
+            ])
+            snippet += '</p>'
+
+            snippet += '<p>'
             #snippet += context[:form].label(:story_points)
             snippet += context[:form].text_field(:story_points, :size => 3)
             snippet += '</p>'

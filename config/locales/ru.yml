@@ -1,5 +1,7 @@
 ---
 ru:
+  field_acceptance_rate: "Степень удовлетворенности"
+
   backlogs_active: активный
   backlogs_any: любой
   backlogs_auto_assign_task: "Автоназначить задачу текущему пользователю"

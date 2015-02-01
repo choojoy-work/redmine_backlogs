@@ -160,4 +160,14 @@ class RbSprint < Version
             self.id]
       ) #.sort {|a,b| a.closed? == b.closed? ?  a.updated_on <=> b.updated_on : (a.closed? ? 1 : -1) }
   end
+
+  def acceptance_rate
+    return 0 if fixed_issues.count == 0
+
+    sum = 0
+    self.fixed_issues.each do |issue|
+      sum += issue.acceptance_rate if issue.acceptance_rate.is_a? Integer
+    end
+    return sum.to_f / self.fixed_issues.count
+  end
 end
