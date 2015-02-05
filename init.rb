@@ -18,8 +18,9 @@ object_to_prepare.to_prepare do
     Issue::SAFE_ATTRIBUTES << "position"
     Issue::SAFE_ATTRIBUTES << "remaining_hours"
     Issue::SAFE_ATTRIBUTES << "acceptance_rate"
+    Issue::SAFE_ATTRIBUTES << "acceptance_criterias_attributes"
   else
-    Issue.safe_attributes "story_points", "position", "remaining_hours", "acceptance_rate"
+    Issue.safe_attributes "story_points", "position", "remaining_hours", "acceptance_rate", "acceptance_criterias_attributes"
   end
 
   if (Redmine::VERSION::MAJOR > 2) || (Redmine::VERSION::MAJOR == 2 && Redmine::VERSION::MINOR >= 3)

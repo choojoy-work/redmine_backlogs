@@ -16,7 +16,6 @@ module Backlogs
         has_one :backlogs_history, :class_name => RbIssueHistory, :dependent => :destroy
         has_many :rb_release_burnchart_day_cache, :dependent => :delete_all
 
-
         validates_inclusion_of :release_relationship, :in => RbStory::RELEASE_RELATIONSHIP
 
         safe_attributes 'release_id','release_relationship' #FIXME merge conflict. is this required?
@@ -25,6 +24,9 @@ module Backlogs
         after_save  :backlogs_after_save
 
         include Backlogs::ActiveRecord::Attributes
+
+        has_many :acceptance_criterias
+        accepts_nested_attributes_for :acceptance_criterias, :allow_destroy => true
       end
     end
 

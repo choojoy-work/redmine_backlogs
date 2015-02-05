@@ -1,5 +1,6 @@
 include RbCommonHelper
 include ContextMenusHelper
+include LinkHelper
 
 module BacklogsPlugin
   module Hooks
@@ -117,15 +118,7 @@ module BacklogsPlugin
           #developers = developers.gsub(/\n/, '')
 
           if issue.is_story?
-            snippet += '<p>'
-            snippet += context[:form].select(:acceptance_rate, [
-             ['Ужасно', -2],
-             ['Плохо', -1],
-             ['Нормально', 0],
-             ['Хорошо', 1],
-             ['Отлично', 2]
-            ])
-            snippet += '</p>'
+            snippet += context[:controller].send(:render_to_string, {:locals => context, :partial => 'hooks/view_issues_form_details_bottom'})
 
             snippet += '<p>'
             #snippet += context[:form].label(:story_points)
