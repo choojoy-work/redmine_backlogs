@@ -170,4 +170,12 @@ class RbSprint < Version
     end
     return sum.to_f / self.fixed_issues.count
   end
+
+  def prev
+    return RbSprint.where("id < ?", self.id).first
+  end
+
+  def dynamics
+    return self.acceptance_rate - self.prev.acceptance_rate
+  end
 end

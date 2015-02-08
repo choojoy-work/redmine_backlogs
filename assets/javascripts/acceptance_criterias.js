@@ -10,30 +10,14 @@ function AcceptanceCriteriaForm(data)
     };
 
     self.remove = function(criteria) {
-        self.criterias.remove(criteria);
+        criteria.destroy(1);
     };
 }
 
 function AcceptanceCriteria(data)
 {
     var self = this;
-    self.id = data.id;
-    self.title = data.title;
-    self._destroy = false;
-}
-
-function remove_fields(link) {
-    console.log('123');
-    $(link).prev("input[type=hidden]").val("1");
-    $(link).closest(".fields").hide();
-}
-
-function add_fields(link, association, content) {
-    console.log(link);
-    console.log(association);
-    console.log(content);
-
-    var new_id = new Date().getTime();
-    var regexp = new RegExp("new_" + association, "g")
-    $(link).parent().before(content.replace(regexp, new_id));
+    self.id = data === undefined ? '' : ko.observable(data.id);
+    self.title = data === undefined ? '' :  ko.observable(data.title);
+    self.destroy = ko.observable(0);
 }
