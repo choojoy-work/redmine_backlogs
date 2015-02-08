@@ -10,7 +10,7 @@
         <%= h sprint.name %>
         <span><%=sprint.acceptance_rate.round(2)%></span>
         <% unless sprint.prev.nil? %>
-            <span style="color: <%= (sprint.dynamics < 0) ? 'red' : 'green' %>"><%=sprint.dynamics.round(2111)%></span>
+            <span style="color: <%= (sprint.dynamics < 0) ? 'red' : 'green' %>"><%=sprint.dynamics.round(2)%></span>
         <% end %>
       </div>
     </div>
