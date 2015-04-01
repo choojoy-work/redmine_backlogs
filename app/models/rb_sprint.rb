@@ -1,4 +1,6 @@
 require 'date'
+require 'fuzzy'
+include Fuzzyrb
 
 class RbSprint < Version
   unloadable
@@ -177,5 +179,50 @@ class RbSprint < Version
 
   def dynamics
     return self.acceptance_rate - self.prev.acceptance_rate
+  end
+
+  def planning
+    good = FuzzySet.trapezoid([80, 90, 100, 100])
+    normal = FuzzySet.trapezoid([70, 80, 80, 90])
+    bad = FuzzySet.trapezoid([0, 70, 70, 80])
+
+    rules = []
+    rules << FuzzyRule.new([good], FuzzySet.trapezoid([1, 1, 1, 1]))
+    rules << FuzzyRule.new([normal], FuzzySet.trapezoid([1, 1, 1, 2]))
+    rules << FuzzyRule.new([bad], FuzzySet.trapezoid([1, 1, 1, 4]))
+
+    ms = MamdaniImplication.new(rules)
+    ms.evaluate([self.closed_percent], {:t_norm => :min, :implication => :larsen, :defuzzification => :CoG})
+  end
+
+  def teamwork
+    bad = FuzzySet.trapezoid([-2, -2, -2, 0])
+    normal = FuzzySet.trapezoid([-0.5, 0, 0, 0.5])
+    good = FuzzySet.trapezoid([0, 2, 2, 2])
+
+    dBad = FuzzySet.trapezoid([-4, -4, -4, 0])
+    dNormal = FuzzySet.trapezoid([-1, 0, 0, 1])
+    dGood = FuzzySet.trapezoid([0, 4, 4, 4])
+
+    rules = []
+    rules << FuzzyRule.new([good, dNormal], good)
+    rules << FuzzyRule.new([good, dBad], bad)
+    rules << FuzzyRule.new([good, dGood], good)
+    rules << FuzzyRule.new([normal, dNormal], normal)
+    rules << FuzzyRule.new([normal, dBad], bad)
+    rules << FuzzyRule.new([normal, dGood], good)
+    rules << FuzzyRule.new([bad, dNormal], bad)
+    rules << FuzzyRule.new([bad, dBad], bad)
+    rules << FuzzyRule.new([bad, dGood], normal)
+    ms = MamdaniImplication.new(rules)
+    res = ms.evaluate([acceptance_rate, dynamics], {:t_norm => :min, :implication => :larsen, :defuzzification => :firstMaximum})
+    case res
+      when 2
+        "Хорошо"
+      when 0
+        "Нормально"
+      when -2
+        "Плохо"
+    end
   end
 end

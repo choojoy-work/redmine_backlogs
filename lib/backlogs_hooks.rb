@@ -414,6 +414,14 @@ module BacklogsPlugin
         end
       end
 
+      def view_versions_show_bottom(context={ })
+        version = context[:version]
+        sprint = RbSprint.find(version[:id])
+        snippet = ''
+        snippet += "<p>Оценка работы команды: #{sprint.teamwork}</p>"
+        snippet += "<p>Завершено историй #{sprint.planning}</p>"
+        return snippet
+      end
     end
   end
 end
