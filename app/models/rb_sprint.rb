@@ -164,13 +164,7 @@ class RbSprint < Version
   end
 
   def acceptance_rate
-    return 0 if fixed_issues.count == 0
-
-    sum = 0
-    self.fixed_issues.each do |issue|
-      sum += issue.acceptance_rate if issue.acceptance_rate.is_a? Integer
-    end
-    return sum.to_f / self.fixed_issues.count
+    self.acceptance_rate_internal(self.fixed_issues)
   end
 
   def prev
@@ -184,18 +178,18 @@ class RbSprint < Version
   def planning
     good = FuzzySet.trapezoid([80, 90, 100, 100])
     normal = FuzzySet.trapezoid([70, 80, 80, 90])
-    bad = FuzzySet.trapezoid([0, 70, 70, 80])
+    bad = FuzzySet.trapezoid([0, 0, 50, 75])
 
     rules = []
-    rules << FuzzyRule.new([good], FuzzySet.trapezoid([1, 1, 1, 1]))
-    rules << FuzzyRule.new([normal], FuzzySet.trapezoid([1, 1, 1, 2]))
-    rules << FuzzyRule.new([bad], FuzzySet.trapezoid([1, 1, 1, 4]))
+    rules << FuzzyRule.new([good], FuzzySet.trapezoid([0.99, 1, 1, 1]))
+    rules << FuzzyRule.new([normal], FuzzySet.trapezoid([1.1, 1.2, 1.2, 1.5]))
+    rules << FuzzyRule.new([bad], FuzzySet.trapezoid([1.2, 1.5, 1.5, 2]))
 
     ms = MamdaniImplication.new(rules)
-    ms.evaluate([self.closed_percent], {:t_norm => :min, :implication => :larsen, :defuzzification => :CoG})
+    ms.evaluate([50], {:t_norm => :min, :implication => :mamdani, :defuzzification => :firstMaximum})
   end
 
-  def teamwork
+  def acceptance_inference(acceptance_rate, dynamics)
     bad = FuzzySet.trapezoid([-2, -2, -2, 0])
     normal = FuzzySet.trapezoid([-0.5, 0, 0, 0.5])
     good = FuzzySet.trapezoid([0, 2, 2, 2])
@@ -221,8 +215,51 @@ class RbSprint < Version
         "Хорошо"
       when 0
         "Нормально"
-      when -2
+      when - 2
         "Плохо"
     end
+  end
+
+  def teamwork
+    self.acceptance_inference(acceptance_rate, dynamics)
+  end
+
+  def personal_work(member)
+    issues = []
+    self.fixed_issues.each do |issue|
+      if issue.assigned_to_id == member.user.id
+        issues << issue
+      end
+    end
+
+
+    personal_acceptance_rate = acceptance_rate_internal(issues)
+
+
+
+    issues.clear
+    self.prev.fixed_issues.each do |issue|
+      if issue.assigned_to_id == member.id
+        issues << issue
+      end
+    end
+
+    if issues.length == 0
+      dynamics = 0
+    else
+      dynamics = acceptance_rate_internal(issues) - personal_acceptance_rate
+    end
+
+    return self.acceptance_inference(personal_acceptance_rate, dynamics)
+  end
+
+  def acceptance_rate_internal(issues)
+    return 0 if issues.count == 0
+
+    sum = 0
+    issues.each do |issue|
+      sum += issue.acceptance_rate if issue.acceptance_rate.is_a? Integer
+    end
+    return sum.to_f / issues.count
   end
 end

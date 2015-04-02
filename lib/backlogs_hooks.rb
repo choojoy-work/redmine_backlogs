@@ -418,8 +418,13 @@ module BacklogsPlugin
         version = context[:version]
         sprint = RbSprint.find(version[:id])
         snippet = ''
-        snippet += "<p>Оценка работы команды: #{sprint.teamwork}</p>"
-        snippet += "<p>Завершено историй #{sprint.planning}</p>"
+        snippet += "<p>Оценка работы команды в целом: #{sprint.teamwork}</p>"
+
+        sprint.project.members.each do |member|
+          snippet += "<p>#{member.name}: #{sprint.personal_work(member)}</p>"
+        end
+
+        snippet += "<p>Коэффициент планирования #{sprint.planning}</p>"
         return snippet
       end
     end
