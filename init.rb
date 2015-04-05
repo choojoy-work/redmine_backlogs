@@ -89,7 +89,8 @@ Redmine::Plugin.register :redmine_backlogs do
                                         :rb_queries          => [:show, :impediments],
                                         :rb_server_variables => [:project, :sprint, :index],
                                         :rb_burndown_charts  => [:embedded, :show, :print],
-                                        :rb_updated_items    => :show
+                                        :rb_updated_items    => :show,
+                                        :performance         => :index
                                       }
 
     permission :view_releases,        {

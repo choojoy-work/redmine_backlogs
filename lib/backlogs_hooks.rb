@@ -417,15 +417,17 @@ module BacklogsPlugin
       def view_versions_show_bottom(context={ })
         version = context[:version]
         sprint = RbSprint.find(version[:id])
-        snippet = ''
-        snippet += "<p>Оценка работы команды в целом: #{sprint.teamwork}</p>"
+        estimator = ExpertSystem::Estimator.new(sprint)
 
-        sprint.project.members.each do |member|
-          snippet += "<p>#{member.name}: #{sprint.personal_work(member)}</p>"
-        end
+        context[:controller].send(:render_to_string, {:locals => { sprint: sprint, estimator: estimator, gavno: "123" }, :partial => 'hooks/sprint_inference'})
+      end
 
-        snippet += "<p>Коэффициент планирования #{sprint.planning}</p>"
-        return snippet
+      def view_projects_roadmap_version_bottom(context={ })
+        version = context[:version]
+        sprint = RbSprint.find(version[:id])
+        estimator = ExpertSystem::Estimator.new(sprint)
+
+        context[:controller].send(:render_to_string, {:locals => { sprint: sprint, estimator: estimator, gavno: "123" }, :partial => 'hooks/sprint_inference'})
       end
     end
   end

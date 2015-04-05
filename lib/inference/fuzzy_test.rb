@@ -1,6 +1,6 @@
 module Inference
-  module FuzzyTest
-    class SampleEvaluator
+  module Estimator
+    class Evaluator
 
 
       bad = Fuzzyrb::FuzzySet.trapezoid([-2, -2, -2, -1])

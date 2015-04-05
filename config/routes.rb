@@ -14,6 +14,7 @@ def rb_match(object, path, hash)
 end
 
 def rb_common_routes(rb)
+  rb_match rb, 'performance/:project_id', :to => 'performance#index', :via => [:get]
   rb_match rb, 'releases/:project_id',
                :to => 'rb_releases#index', :via => [:get]
   rb_match rb, 'release/:project_id/new',

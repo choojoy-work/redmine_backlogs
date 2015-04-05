@@ -1,0 +1,23 @@
+<canvas id="chart-<%=sprint.object_id%>" width="800" height="400"></canvas>
+
+<script>
+    var ctx = document.getElementById("chart-<%=sprint.object_id%>").getContext("2d");
+
+    var data = {
+        labels: ["Степень удовлетворенности", "Динамика степени удовлетворенности", "Стабильность скорости", "Соответствие срокам", "Итоговая продуктивность"],
+        datasets: [
+            {
+                label: "My First dataset",
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: [<%=estimator.acceptance_rate_inference%>, <%=estimator.acceptance_rate_dynamics_inference%>, <%=estimator.velocity_dynamics_inference%>, <%=estimator.on_time_delivery_inference%>, <%=estimator.inference%>]
+            }
+        ]
+    };
+
+    var myRadarChart = new Chart(ctx).Radar(data);
+</script>

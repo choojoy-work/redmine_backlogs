@@ -1,0 +1,157 @@
+<canvas id="chart-global" width="800" height="400"></canvas>
+<div id="legend"></div>
+
+<style>
+  #legend {
+      float: right;
+  }
+
+    .line-legend {
+        list-style-type: none;
+    }
+
+  .line-legend span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 10px 5px 5px 5px;
+  }
+
+  .data-table {
+      background-color: #efefef;
+  }
+
+    .data-table td {
+        padding: 10px;
+
+    }
+</style>
+
+<script>
+    var ctx = document.getElementById("chart-global").getContext("2d");
+
+    var labels = [];
+    var datasets = [
+        {
+            label: "Степень удовлетворенности",
+            strokeColor: "rgba(255,51,51,1)",
+            data: []
+        },
+        {
+            label: "Динамика степени удовлетворенности",
+            strokeColor: "rgba(255,255,51,1)",
+            data: []
+        },
+        {
+            label: "Стабильность скорости",
+            strokeColor: "rgba(51,255,51,1)",
+            data: []
+        },
+        {
+            label: "Соответствие срокам",
+            strokeColor: "rgba(51,255,255,1)",
+            data: []
+        },
+        {
+            label: "Итоговая продуктивность",
+            strokeColor: "rgba(51,51,51,1)",
+            data: []
+        }
+    ];
+
+    <% @project.open_shared_sprints.each do |sprint| estimator = ExpertSystem::Estimator.new(sprint)  %>
+    labels.push("<%=sprint.name%>");
+    datasets[0].data.push("<%=estimator.acceptance_rate_inference%>");
+    datasets[1].data.push("<%=estimator.acceptance_rate_dynamics_inference%>");
+    datasets[2].data.push("<%=estimator.velocity_dynamics_inference%>");
+    datasets[3].data.push("<%=estimator.on_time_delivery_inference%>");
+    datasets[4].data.push("<%=estimator.inference%>");
+    <% end %>
+
+    var data = {
+        labels: labels,
+        datasets: datasets
+    };
+
+    var myRadarChart = new Chart(ctx).Line(data, {
+        datasetFill: false
+    });
+
+    $('#legend').html(myRadarChart.generateLegend());
+</script>
+
+<%
+    data = [
+            {
+                    label: "Степень удовлетворенности",
+                    data: []
+            },
+            {
+                    label: "Динамика степени удовлетворенности",
+                    data: []
+            },
+            {
+                    label: "Стабильность скорости",
+                    data: []
+            },
+            {
+                    label: "Соответствие срокам",
+                    data: []
+            },
+            {
+                    label: "Итоговая продуктивность",
+                    data: []
+            }
+    ]
+
+    @project.open_shared_sprints.each_with_index do |sprint, index|
+      estimator = ExpertSystem::Estimator.new(sprint)
+      data[0][:data][index] = estimator.acceptance_rate_inference
+      data[1][:data][index] = estimator.acceptance_rate_dynamics_inference
+      data[2][:data][index] = estimator.velocity_dynamics_inference
+      data[3][:data][index] = estimator.on_time_delivery_inference
+      data[4][:data][index] = estimator.inference
+    end
+
+
+   data.each_with_index do |row, index|
+     min = 100
+     max = 0
+     row[:data].each do |value|
+       min = value if value < min
+       max = value if value > max
+     end
+
+    data[index][:min] = min
+     data[index][:max] = max
+   end
+
+   data[0].max
+%>
+
+<table class="data-table">
+  <thead>
+    <th>
+      <% @project.open_shared_sprints.each do |sprint| %>
+        <td><%=sprint.name%></td>
+      <% end %>
+    </th>
+  </thead>
+    <tbody>
+        <% data.each do |row| %>
+            <tr>
+              <td><%=row[:label]%></td>
+                <% row[:data].each do |value| %>
+                  <% if value == row[:min] %>
+                      <td><b style="color: red;"><%=sprintf('%.2f', value)%></b></td>
+                  <% elsif value == row[:max] %>
+                      <td><b style="color: green;"><%=sprintf('%.2f', value)%></b></td>
+                  <% else %>
+                      <td><%=sprintf('%.2f', value)%></td>
+                  <% end %>
+                <% end %>
+            </tr>
+        <% end %>
+    </tbody>
+  </thead>
+</table>

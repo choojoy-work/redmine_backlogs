@@ -168,7 +168,7 @@ class RbSprint < Version
   end
 
   def prev
-    return RbSprint.where("id < ?", self.id).first
+    return RbSprint.where("id < ?", self.id).where("project_id = ?", self.project_id).order("id DESC").first
   end
 
   def dynamics
