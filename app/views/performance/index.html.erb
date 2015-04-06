@@ -6,6 +6,10 @@
       float: right;
   }
 
+  #chart-global {
+      margin-bottom: 40px;
+  }
+
     .line-legend {
         list-style-type: none;
     }
@@ -133,7 +137,7 @@
   <thead>
     <th>
       <% @project.open_shared_sprints.each do |sprint| %>
-        <td><%=sprint.name%></td>
+        <td><%= link_to_version sprint %></td>
       <% end %>
     </th>
   </thead>
