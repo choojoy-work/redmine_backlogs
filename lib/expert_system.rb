@@ -1,3 +1,6 @@
+require 'fuzzy'
+include Fuzzyrb
+
 module ExpertSystem
   class Estimator
     ACCEPTANCE_CRITERIA_SETS = [
@@ -34,7 +37,7 @@ module ExpertSystem
       @sprint = sprint
     end
 
-    def inference
+    def inference(member = nil)
       rules = []
 
       3.times do |a|
@@ -49,7 +52,7 @@ module ExpertSystem
       end
 
       ms = MamdaniImplication.new(rules)
-      ms.evaluate([acceptance_rate, acceptance_rate_dynamics, velocity_dynamics, on_time_delivery], {:t_norm => :min, :implication => :larsen, :defuzzification => :CoG})
+      ms.evaluate([acceptance_rate(@sprint), acceptance_rate_dynamics(@sprint), velocity_dynamics(@sprint), on_time_delivery(@sprint)], {:t_norm => :min, :implication => :larsen, :defuzzification => :CoG})
     end
 
     def single_inference(sets, value)
@@ -63,72 +66,75 @@ module ExpertSystem
     end
 
     def acceptance_rate_inference(member = nil)
-      single_inference(ACCEPTANCE_CRITERIA_SETS, acceptance_rate)
+      single_inference(ACCEPTANCE_CRITERIA_SETS, acceptance_rate(@sprint, member))
     end
 
-    def acceptance_rate_dynamics_inference
-      single_inference(ACCEPTANCE_CRITERIA_DYNAMICS_SETS, acceptance_rate_dynamics)
+    def acceptance_rate_dynamics_inference(member = nil)
+      single_inference(ACCEPTANCE_CRITERIA_DYNAMICS_SETS, acceptance_rate_dynamics(@sprint, member))
     end
 
-    def on_time_delivery_inference
-      single_inference(ON_TIME_DELIVERY_SETS, on_time_delivery)
+    def on_time_delivery_inference(member = nil)
+      single_inference(ON_TIME_DELIVERY_SETS, on_time_delivery(@sprint, member))
     end
 
-    def velocity_dynamics_inference
-      single_inference(VELOCITY_DYNAMICS_SETS, velocity_dynamics)
+    def velocity_dynamics_inference(member = nil)
+      single_inference(VELOCITY_DYNAMICS_SETS, velocity_dynamics(@sprint, member))
     end
 
     def filter_stories(sprint, member = nil)
       issues = []
       sprint.fixed_issues.each do |issue|
-        issues << issue if issue.closed? && (member === nil || issue.assigned_to_id == member.user.id)
+        issues << issue if (member === nil || issue.assigned_to_id == member.user.id)
       end
       issues
     end
 
-    def velocity_dynamics
+    def velocity_dynamics(sprint, member = nil)
       if @sprint.prev.nil?
         1
       else
-        old = velocity(@sprint.prev, true)
-        new = velocity(@sprint, true)
+        old = velocity(sprint.prev, member, true)
+        new = velocity(sprint, member, true)
         new / old
       end
     end
 
-    def acceptance_rate_dynamics
-      if @sprint.prev.nil?
+    def acceptance_rate_dynamics(sprint, member = nil)
+      if sprint.prev.nil?
         0
       else
-        old = acceptance_rate(@sprint.prev)
-        new = acceptance_rate(@sprint)
+        old = acceptance_rate(sprint.prev, member)
+        new = acceptance_rate(sprint, member)
         new - old
       end
     end
 
-    def acceptance_rate(sprint = nil)
-      sprint = @sprint if sprint === nil
-      acceptance_rate_internal(filter_stories(sprint))
+    def on_time_delivery(sprint, member = nil)
+      velocity(sprint, member, true) / velocity(sprint, member)
     end
 
-    def on_time_delivery
-      velocity(@sprint, true) / velocity(@sprint)
-    end
+    def acceptance_rate(sprint, member = nil)
+      issues = filter_stories(sprint, member)
 
-    def acceptance_rate_internal(issues)
+      closed_issues = []
+      issues.each_with_index do |issue, index|
+        closed_issues << issue if issue.closed?
+      end
+
       return 0 if issues.count == 0
 
       sum = 0
-      issues.each do |issue|
+      closed_issues.each do |issue|
         weight = issue.story_points.is_a?(Integer) ? issue.story_points : 1
         sum += issue.acceptance_rate * weight if issue.acceptance_rate.is_a? Integer
       end
       sum.to_f / issues.count
     end
 
-    def velocity(sprint, fact = false)
+    def velocity(sprint, member = nil, fact = false)
+      issues = filter_stories(sprint, member)
       sum = 0
-      sprint.fixed_issues.each do |issue|
+      issues.each do |issue|
         sum += issue.story_points if (! fact || issue.closed?)
       end
       sum

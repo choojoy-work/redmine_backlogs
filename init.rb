@@ -151,7 +151,8 @@ Redmine::Plugin.register :redmine_backlogs do
     permission :view_scrum_statistics,   { :rb_all_projects => :statistics }
   end
 
-  menu :project_menu, :rb_master_backlogs, { :controller => :rb_master_backlogs, :action => :show }, :caption => :label_backlogs, :after => :roadmap, :param => :project_id, :if => Proc.new { Backlogs.configured? }
+  menu :project_menu, :performance, { :controller => :performance, :action => :index }, :caption => "Продуктивность", :after => :roadmap, :param => :project_id, :if => Proc.new { Backlogs.configured? }
+  menu :project_menu, :rb_master_backlogs, { :controller => :rb_master_backlogs, :action => :show }, :caption => :label_backlogs, :after => :performance, :param => :project_id, :if => Proc.new { Backlogs.configured? }
   menu :project_menu, :rb_taskboards, { :controller => :rb_taskboards, :action => :current }, :caption => :label_task_board, :after => :rb_master_backlogs, :param => :project_id, :if => Proc.new {|project| Backlogs.configured? && project && project.active_sprint }
   menu :project_menu, :rb_releases, { :controller => :rb_releases, :action => :index }, :caption => :label_release_plural, :after => :rb_taskboards, :param => :project_id, :if => Proc.new { Backlogs.configured? }
 
