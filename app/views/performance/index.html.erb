@@ -1,8 +1,19 @@
 <canvas id="chart-global" width="800" height="400"></canvas>
 <div id="legend"></div>
 
+<ul class="users">
+  <li><%=link_to_if(! @member.nil?, "Команда в целом", { :controller => "performance", :action => "index" })%></li>
+    <% @project.members.each do |member| %>
+        <li><%=link_to_unless_current(member.user.name, { :controller => "performance", :action => "index", :member_id => member.id })%></li>
+    <% end %>
+</ul>
+
 <style>
   #legend {
+      float: right;
+  }
+
+  .users {
       float: right;
   }
 
@@ -65,11 +76,11 @@
 
     <% @project.open_shared_sprints.each do |sprint| estimator = ExpertSystem::Estimator.new(sprint)  %>
     labels.push("<%=sprint.name%>");
-    datasets[0].data.push("<%=estimator.acceptance_rate_inference%>");
-    datasets[1].data.push("<%=estimator.acceptance_rate_dynamics_inference%>");
-    datasets[2].data.push("<%=estimator.velocity_dynamics_inference%>");
-    datasets[3].data.push("<%=estimator.on_time_delivery_inference%>");
-    datasets[4].data.push("<%=estimator.inference%>");
+    datasets[0].data.push("<%=estimator.acceptance_rate_inference(@member)%>");
+    datasets[1].data.push("<%=estimator.acceptance_rate_dynamics_inference(@member)%>");
+    datasets[2].data.push("<%=estimator.velocity_dynamics_inference(@member)%>");
+    datasets[3].data.push("<%=estimator.on_time_delivery_inference(@member)%>");
+    datasets[4].data.push("<%=estimator.inference(@member)%>");
     <% end %>
 
     var data = {
