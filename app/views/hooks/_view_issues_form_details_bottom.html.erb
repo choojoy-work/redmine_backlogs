@@ -10,6 +10,12 @@
     </p>
 <% end %>
 
+<style>
+#acceptance_criterias_form label {
+    display: none;
+}  
+</style>
+
 <div id="acceptance_criterias_form">
   <p><strong>Критерии приемки</strong></p>
   <!-- ko foreach: criterias -->
@@ -17,7 +23,7 @@
       <p data-bind="visible: destroy() != 1">
         <%= f.hidden_field :id, "data-bind" => "value: id" %>
         <%= f.hidden_field :_destroy, "data-bind" => "value: destroy" %>
-        <%= f.text_field :title, "data-bind" => "textInput: title"  %>
+        <%= f.text_field :title, "data-bind" => "textInput: title", "label" => "gavno"  %>
         <a data-bind="click: $parent.remove">Удалить</a>
       </p>
   <% end %>

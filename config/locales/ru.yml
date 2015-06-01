@@ -1,6 +1,7 @@
 ---
 ru:
   field_acceptance_rate: "Степень удовлетворенности"
+  project_module_backlogs: "Оценка успешности проекта"
 
   backlogs_active: активный
   backlogs_any: любой

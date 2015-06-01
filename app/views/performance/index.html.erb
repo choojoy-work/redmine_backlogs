@@ -1,19 +1,18 @@
 <canvas id="chart-global" width="800" height="400"></canvas>
-<div id="legend"></div>
 
-<ul class="users">
-  <li><%=link_to_if(! @member.nil?, "Команда в целом", { :controller => "performance", :action => "index" })%></li>
-    <% @project.members.each do |member| %>
-        <li><%=link_to_unless_current(member.user.name, { :controller => "performance", :action => "index", :member_id => member.id })%></li>
-    <% end %>
-</ul>
+<div id="side">
+    <div id="legend"></div>
+
+    <ul class="users">
+      <li><%=link_to_if(! @member.nil?, "Команда в целом", { :controller => "performance", :action => "index" })%></li>
+        <% @project.members.each do |member| %>
+            <li><%=link_to_unless_current(member.user.name, { :controller => "performance", :action => "index", :member_id => member.id })%></li>
+        <% end %>
+    </ul>
+</div>
 
 <style>
-  #legend {
-      float: right;
-  }
-
-  .users {
+  #side {
       float: right;
   }
 

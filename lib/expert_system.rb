@@ -90,11 +90,13 @@ module ExpertSystem
     end
 
     def velocity_dynamics(sprint, member = nil)
-      if @sprint.prev.nil?
+      return 1 if sprint.prev.nil?
+      old = velocity(sprint.prev, member, true)
+      new = velocity(sprint, member, true)
+
+      if old == 0 || new == 0
         1
       else
-        old = velocity(sprint.prev, member, true)
-        new = velocity(sprint, member, true)
         new / old
       end
     end
@@ -110,32 +112,42 @@ module ExpertSystem
     end
 
     def on_time_delivery(sprint, member = nil)
-      velocity(sprint, member, true) / velocity(sprint, member)
+      fact = velocity(sprint, member, true)
+      planned = velocity(sprint, member)
+      if fact == 0 || planned == 0
+        1
+      else
+        fact / planned
+      end
     end
 
     def acceptance_rate(sprint, member = nil)
       issues = filter_stories(sprint, member)
 
       closed_issues = []
-      issues.each_with_index do |issue, index|
+      issues.each do |issue|
         closed_issues << issue if issue.closed?
       end
 
-      return 0 if issues.count == 0
+      return 0 if closed_issues.count == 0
 
-      sum = 0
+      top = 0
+      bottom = 0
       closed_issues.each do |issue|
-        weight = issue.story_points.is_a?(Integer) ? issue.story_points : 1
-        sum += issue.acceptance_rate * weight if issue.acceptance_rate.is_a? Integer
+        if issue.acceptance_rate.is_a?(Integer)
+          weight = issue.story_points.is_a?(Integer) ? issue.story_points : 1
+          top += issue.acceptance_rate * weight
+          bottom += weight
+        end
       end
-      sum.to_f / issues.count
+      bottom == 0 ? 0 : top.to_f / bottom
     end
 
     def velocity(sprint, member = nil, fact = false)
       issues = filter_stories(sprint, member)
       sum = 0
       issues.each do |issue|
-        sum += issue.story_points if (! fact || issue.closed?)
+        sum += issue.story_points if (issue.story_points.is_a?(Float) && (! fact || issue.closed?))
       end
       sum
     end
