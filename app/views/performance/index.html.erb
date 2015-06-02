@@ -120,11 +120,11 @@
 
     @project.open_shared_sprints.each_with_index do |sprint, index|
       estimator = ExpertSystem::Estimator.new(sprint)
-      data[0][:data][index] = estimator.acceptance_rate_inference
-      data[1][:data][index] = estimator.acceptance_rate_dynamics_inference
-      data[2][:data][index] = estimator.velocity_dynamics_inference
-      data[3][:data][index] = estimator.on_time_delivery_inference
-      data[4][:data][index] = estimator.inference
+      data[0][:data][index] = estimator.acceptance_rate_inference(@member)
+      data[1][:data][index] = estimator.acceptance_rate_dynamics_inference(@member)
+      data[2][:data][index] = estimator.velocity_dynamics_inference(@member)
+      data[3][:data][index] = estimator.on_time_delivery_inference(@member)
+      data[4][:data][index] = estimator.inference(@member)
     end
 
 
