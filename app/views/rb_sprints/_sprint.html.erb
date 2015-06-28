@@ -8,10 +8,6 @@
     <div class="fff-middle">
       <div class="name editable" fieldname="name" fieldlabel="<%=l(:field_name)%>">
         <%= h sprint.name %>
-        <span><%=sprint.acceptance_rate.round(2)%></span>
-        <% unless sprint.prev.nil? %>
-            <span style="color: <%= (sprint.dynamics < 0) ? 'red' : 'green' %>"><%=sprint.dynamics.round(2)%></span>
-        <% end %>
       </div>
     </div>
   </div>
